@@ -6,6 +6,15 @@ Functionality based on Simple poll, but you can self host it, to have unlimited 
 
 ![Polly preview](assets/preview.png)
 
+*Note: Currently only type of question/poll is supported, where you can vote for multiple choices and remove any of your previous votes*
+
+## Example Usage
+
+`/polly What is my favourite color?|red|green|blue`
+
+Will generate the question above.
+
+
 ## Install
 
 ### Server
@@ -56,6 +65,7 @@ Feel free to create a PR or fork the repo.
 
 ### Could be nice
 
+- Single choice poll creation
 - Dockerize the server
 - Terraform an AWS EC2 and RDS Free Tier instances and to setup the server with a single command
 - More configuration options for questions

@@ -4,6 +4,8 @@ This is a basic open source version for [Slack](https://api.slack.com).
 
 Functionality based on Simple poll, but you can self host it, to have unlimited polls and choices.
 
+![Polly preview](assets/preview.png)
+
 ## Install
 
 ### Server
@@ -30,14 +32,20 @@ LOG_LEVEL=info
 
 ### Slack app
 
-- Create a Slack app for your organization
+- [Create a Slack app for your organization](https://api.slack.com/apps)
 - Create a `Slash command` feature
   - The `command` can be anything, like `/polly`
   - The `Request URL` should be `http://yourserver.com/hook`
   - `Description` can be anything, like `Create a poll, free and unlimited!`
   - `Usage hint` should be `Question?|Answer 1|Answer 2`
+
+![Slash command](assets/slack-slash.png)
+
 - Activate the `Interactive Components` feature
   - The `Request URL` should be `http://yourserver.com/action`
+
+![Interactive components](assets/slack-intcomp.png)
+
 - At the `OAuth & Permissions` feature select the scope `users.profile:read` (so the app can get the profile pictures for voters)
 - Install it to your workspace
   - Grab the `OAuth Access Token` and place it as `SLACK_TOKEN` environment variable

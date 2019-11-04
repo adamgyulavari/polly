@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 const service = require('./pollyService')
+const logger = require('./logger')
 const { getIds } = require('./helper')
 
 const app = express()
@@ -14,31 +15,29 @@ app.use(bodyParser.json())
 app.post('/hook', async (req, res) => {
   const [question, ...answers] = req.body.text.split('|')
   
-  const current = await service.storeQuestion({
+  const message = await service.storeQuestion({
     user: req.body.user_name,
     question
   }, answers)
   
-  res.send(service.slackMessage(current))
+  res.send(message)
 })
 
 app.post('/action', async (req, res) => {
   const payload = JSON.parse(req.body.payload)
   const [questionId, answerId] = getIds(payload)
+  
+  res.send()
 
-  await service.handleVote({
+  await service.storeVote({
     answer_id: answerId,
-    user: payload.user.username
+    user: payload.user
   })
-  
-  res.send({
-    text: 'You voted.'
-  })
-  
+
   service.updateOriginalMessage(questionId, payload.response_url)
 })
 
 app.listen(process.env.PORT, () => {
-  console.log(`server started at ${process.env.PORT}`)
+  logger.info(`server started at ${process.env.PORT}`)
 })
 

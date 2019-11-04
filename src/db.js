@@ -1,4 +1,5 @@
 const mysql = require('mysql')
+const logger = require('./logger')
 
 class DatabaseAPI {
 
@@ -14,7 +15,7 @@ class DatabaseAPI {
     try {
       this._initTablesIfNecessary()
     } catch (error) {
-      console.log('Error while initializing the database tables', error)
+      logger.error('Error while initializing the database tables', error)
     }
   }
 
@@ -25,7 +26,7 @@ class DatabaseAPI {
       data.id = result.insertId
       return result
     } catch (error) {
-      console.log('Cant save record into' + table, error)
+      logger.error('Cant save record into' + table, error)
     }
     return null
   }
@@ -87,6 +88,7 @@ class DatabaseAPI {
       name: 'votes',
       id: 'INT AUTO_INCREMENT PRIMARY KEY',
       user: 'VARCHAR(255) NOT NULL',
+      pic: 'VARCHAR(255) NOT NULL',
       answer_id: 'INT NOT NULL'
     })
   }
@@ -94,15 +96,15 @@ class DatabaseAPI {
   async _createTable({name, ...fields}) {
     await this.query(`CREATE TABLE IF NOT EXISTS ${name} (`
       + Object.entries(fields).map(([field, type]) => `${field} ${type}`).join(', ') + ')')
-    console.log(`${name} table created.`)
+    logger.info(`${name} table created.`)
   }
 
   query(sql, params) {
     return new Promise((resolve, reject) => {
       let query = this._connection.query(sql, params, (error, results, fields) => {
-        if(this.logEnabled) console.log(query.sql)
+        logger.debug(query.sql)
         if(error) return reject(error)
-        if(this.logEnabled) console.log(results)
+        logger.debug(results)
         resolve(results, fields)
       })
     })

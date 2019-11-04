@@ -32,9 +32,20 @@ app.post('/action', async (req, res) => {
   await service.storeVote({
     answer_id: answerId,
     user: payload.user
-  })
+  }, req.body.token)
 
   service.updateOriginalMessage(questionId, payload.response_url)
+})
+
+app.get('/register', (_, res) => {
+  res.sendFile(__dirname + '/static/register.html')
+})
+
+app.post('/register', async (req, res) => {
+  const { verification, oauth } = req.body
+  await service.register(verification, oauth)
+
+  res.send('Registered.')
 })
 
 app.listen(process.env.PORT, () => {

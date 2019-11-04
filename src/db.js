@@ -31,6 +31,24 @@ class DatabaseAPI {
     return null
   }
 
+  async update(table, selectors, data) {
+    try {
+      let sql = `UPDATE ${this._connection.escapeId(table)} SET `
+      sql += Object.entries(data).map(
+        ([key, value]) => 
+          this._connection.escapeId(key) + '=' + this._connection.escape(value)).join(', ')
+      if(selectors) {
+        sql += ' WHERE '
+        sql += Object.entries(selectors).map(
+          ([key, value]) => 
+            this._connection.escapeId(key) + '=' + this._connection.escape(value)).join(' AND ')
+      }
+      return this.query(sql)
+    } catch (error) {
+      logger.error('Cant update record in' + table, error)
+    }
+  }
+
   findAll(table, ids) {
     let sql = 'SELECT * FROM ?'
     let data = [table]
@@ -90,6 +108,11 @@ class DatabaseAPI {
       user: 'VARCHAR(255) NOT NULL',
       pic: 'VARCHAR(255) NOT NULL',
       answer_id: 'INT NOT NULL'
+    })
+    this._createTable({
+      name: 'apps',
+      verification: 'VARCHAR(100) PRIMARY KEY',
+      oauth: 'VARCHAR(255) NOT NULL'
     })
   }
 

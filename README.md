@@ -31,7 +31,6 @@ DB_PORT=3306
 DB_USER=admin
 DB_PASSWORD=yourpassword
 DB_NAME=polly
-SLACK_TOKEN=xoxo-...
 LOG_LEVEL=info
 ```
 - Accepted log levels: `error`, `info`, `debug`
@@ -57,7 +56,11 @@ LOG_LEVEL=info
 
 - At the `OAuth & Permissions` feature select the scope `users.profile:read` (so the app can get the profile pictures for voters)
 - Install it to your workspace
-  - Grab the `OAuth Access Token` and place it as `SLACK_TOKEN` environment variable
+  - Grab the `OAuth Access Token` and the `Verification Token` and register the created app at `http://yourserver.com/register`
+
+![Register preview](assets/register.png)
+
+- This way you can have multiple apps using the same polly server (which is needed for different workspaces, unless you want to publish the app)
 
 ## Contributing
 

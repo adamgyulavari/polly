@@ -5,6 +5,17 @@ const slack = require('./slack')
 const logger = require('./logger')
 const db = databaseApi(true)
 
+const register = async (verification, oauth) => {
+  const app = await db.find('apps', { verification })
+  if (app.length === 0) {
+    await db.save('apps', { verification, oauth })
+    logger.info('App registered.')
+  } else {
+    await db.update('apps', { verification }, { oauth })
+    logger.info('App updated.')
+  }
+}
+
 const updateOriginalMessage = async (questionId, url) => {
   const question = await _getFullQuestion(questionId)
   const newMessage = slack.message(question)
@@ -19,7 +30,7 @@ const updateOriginalMessage = async (questionId, url) => {
   }).then(res => res.json()).then(logger.debug)
 }
 
-const storeVote = async (vote) => {
+const storeVote = async (vote, verification) => {
   const userId = vote.user.id
   vote.user = vote.user.username
   const dbVote = await db.find('votes', vote)
@@ -27,8 +38,7 @@ const storeVote = async (vote) => {
     await db.remove('votes', dbVote[0].id)
     logger.info('Vote removed with id ' + dbVote[0].id)
   } else {
-    vote.pic = (await fetch(_getUserProfileUrl(userId))
-      .then(res => res.json())).profile.image_24
+    vote.pic = await _fetchProfilePicture(userId, verification)
     await db.save('votes', vote)
     logger.info('Vote stored with id ' + vote.id)
   }
@@ -52,8 +62,14 @@ const storeQuestion = async (question, answers) => {
   return slack.message(question)
 }
 
-const _getUserProfileUrl = (userId) => 
-  `https://slack.com/api/users.profile.get?user=${userId}&token=${process.env.SLACK_TOKEN}`
+const _fetchProfilePicture = async (userId, verification) => {
+  const oauth = await db.find('apps', { verification })
+  if(oauth.length === 1) {
+    return (await fetch(`https://slack.com/api/users.profile.get?user=${userId}&token=${oauth}`)
+      .then(res => res.json())).profile.image_24
+  } else return null
+}
+  
 
 const _getFullQuestion = async (questionId) => {
   const question = await db.findOne('questions', questionId)
@@ -77,6 +93,7 @@ const _NO_ANSWERS = 'A question or poll must have answers or options.'
 module.exports = {
   updateOriginalMessage,
   message: slack.message,
+  register,
   storeQuestion,
   storeVote
 }

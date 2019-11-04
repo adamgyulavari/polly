@@ -68,7 +68,10 @@ const _voters = (voters) => {
 
 const message = (question) => {
   const message = _response(question)
-  question.answers.sort((a, b) => b.voters.length - a.voters.length).forEach((a) => message.blocks = message.blocks.concat(_answer(question.id, a)))
+  question.answers.sort((a, b) => 
+    a.voters && b.voters
+    ? b.voters.length - a.voters.length
+    : 0).forEach((a) => message.blocks = message.blocks.concat(_answer(question.id, a)))
   message.response_type = 'in_channel'
   return message
 }

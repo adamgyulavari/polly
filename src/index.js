@@ -32,7 +32,7 @@ app.post('/action', async (req, res) => {
   await service.storeVote({
     answer_id: answerId,
     user: payload.user
-  }, req.body.token)
+  }, payload.token)
 
   service.updateOriginalMessage(questionId, payload.response_url)
 })
